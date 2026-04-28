@@ -36,13 +36,6 @@ fn draw_shadow(painter: &egui::Painter, rect: egui::Rect, offset: egui::Vec2, co
     painter.rect_filled(inner, 10.0, Color32::from_rgba_premultiplied(color.r(), color.g(), color.b(), color.a() / 2));
 }
 
-fn first_char(s: &str) -> &str {
-    s.char_indices()
-        .next()
-        .map(|(i, c)| &s[i..i + c.len_utf8()])
-        .unwrap_or("")
-}
-
 pub fn render(
     ui: &mut egui::Ui,
     template: &dyn Template,
