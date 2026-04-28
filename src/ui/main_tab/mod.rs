@@ -8,6 +8,7 @@ use eframe::egui;
 use egui::Color32;
 use std::sync::Arc;
 use super::{App, Tab};
+use self::preview::PreviewTexts;
 
 pub fn render(ui: &mut egui::Ui, app: &mut App) {
     let dark = app.dark_mode;
@@ -19,6 +20,21 @@ pub fn render(ui: &mut egui::Ui, app: &mut App) {
     };
     let current_template: Arc<dyn crate::templates::Template> =
         Arc::clone(&app.templates[app.selected_template_idx]);
+
+    // 构建预览文本结构体
+    let preview_texts = PreviewTexts {
+        preview_label: app.tr("preview_label").to_string(),
+        export_theme: app.tr("export_theme").to_string(),
+        import_theme: app.tr("import_theme").to_string(),
+        no_preview: app.tr("no_preview").to_string(),
+        app_title: app.tr("app_title").to_string(),
+        submit: app.tr("preview_submit").to_string(),
+        badge: app.tr("preview_badge").to_string(),
+        option1: app.tr("preview_option1").to_string(),
+        option2: app.tr("preview_option2").to_string(),
+        option3: app.tr("preview_option3").to_string(),
+        option4: app.tr("preview_option4").to_string(),
+    };
 
     let title_text = app.tr("app_title").to_string();
 
@@ -55,7 +71,13 @@ pub fn render(ui: &mut egui::Ui, app: &mut App) {
         });
 
         columns[1].vertical_centered(|ui| {
-            preview::render(ui, current_template.as_ref(), dark, &mut app.pending_import_theme);
+            preview::render(
+                ui,
+                current_template.as_ref(),
+                dark,
+                &mut app.pending_import_theme,
+                &preview_texts,
+            );
         });
     });
 

@@ -1,0 +1,23 @@
+Title: My Quiz
+
+---
+Type: Single
+Question: What is 1+1?
+Options: 1|2|3|4
+Answer: 2
+
+---
+Type: Multiple
+Question: Which are even numbers?
+Options: 1|2|3|4
+Answer: 2,4
+
+---
+Type: Fill
+Question: Two plus two equals ?
+Answer: 4|four
+
+---
+Type: Judgment
+Question: The sky is blue.
+Answer: True

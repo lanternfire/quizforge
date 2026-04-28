@@ -3,6 +3,20 @@ use egui::{Color32, Stroke};
 use rfd::FileDialog;
 use crate::templates::Template;
 
+pub struct PreviewTexts {
+    pub preview_label: String,
+    pub export_theme: String,
+    pub import_theme: String,
+    pub no_preview: String,
+    pub app_title: String,
+    pub submit: String,
+    pub badge: String,
+    pub option1: String,
+    pub option2: String,
+    pub option3: String,
+    pub option4: String,
+}
+
 fn parse_color(hex: &str) -> Color32 {
     let hex = hex.trim_start_matches('#');
     if hex.len() == 6 {
@@ -22,14 +36,28 @@ fn draw_shadow(painter: &egui::Painter, rect: egui::Rect, offset: egui::Vec2, co
     painter.rect_filled(inner, 10.0, Color32::from_rgba_premultiplied(color.r(), color.g(), color.b(), color.a() / 2));
 }
 
-pub fn render(ui: &mut egui::Ui, template: &dyn Template, dark_mode: bool, pending_import: &mut Option<String>) {
+fn first_char(s: &str) -> &str {
+    s.char_indices()
+        .next()
+        .map(|(i, c)| &s[i..i + c.len_utf8()])
+        .unwrap_or("")
+}
+
+pub fn render(
+    ui: &mut egui::Ui,
+    template: &dyn Template,
+    dark_mode: bool,
+    pending_import: &mut Option<String>,
+    texts: &PreviewTexts,
+) {
     let caption_color = if dark_mode {
         Color32::from_rgb(180, 180, 180)
     } else {
         Color32::from_rgb(100, 120, 140)
     };
+
     ui.add_space(10.0);
-    ui.label(egui::RichText::new("预览图").size(14.0).color(caption_color));
+    ui.label(egui::RichText::new(&texts.preview_label).size(14.0).color(caption_color));
     ui.add_space(5.0);
 
     if let Some(theme) = template.theme_colors() {
@@ -49,7 +77,7 @@ pub fn render(ui: &mut egui::Ui, template: &dyn Template, dark_mode: bool, pendi
         painter.text(
             title_rect.left_center(),
             egui::Align2::LEFT_CENTER,
-            "题匠",
+            &texts.app_title,
             egui::FontId::proportional(15.0),
             parse_color(&theme.primary_deep),
         );
@@ -62,7 +90,7 @@ pub fn render(ui: &mut egui::Ui, template: &dyn Template, dark_mode: bool, pendi
         painter.text(
             badge_rect.center(),
             egui::Align2::CENTER_CENTER,
-            "单选题",
+            &texts.badge,
             egui::FontId::proportional(11.0),
             parse_color(&theme.badge_single_text),
         );
@@ -96,12 +124,15 @@ pub fn render(ui: &mut egui::Ui, template: &dyn Template, dark_mode: bool, pendi
         );
 
         let option_y_start = 82.0;
-        let options = ["A. 选项一", "B. 选项二 (选中)", "C. 选项三", "D. 选项四"];
-        for (i, opt) in options.iter().enumerate() {
+        let letters = ["A", "B", "C", "D"];
+        let option_texts = [&texts.option1, &texts.option2, &texts.option3, &texts.option4];
+        for (i, (letter, opt_text)) in letters.iter().zip(option_texts.iter()).enumerate() {
             let opt_rect = egui::Rect::from_min_size(
                 rect.min + egui::vec2(18.0, option_y_start + i as f32 * 22.0),
                 egui::vec2(264.0, 19.0),
             );
+            // 选项文本：字母 + 本地化文字
+            let full_text = format!("{}. {}", letter, opt_text);
             if i == 1 {
                 painter.rect_filled(opt_rect, 6.0, parse_color(&theme.highlight_bg));
                 painter.rect_stroke(opt_rect, 6.0, Stroke::new(1.5, parse_color(&theme.highlight_border)));
@@ -113,14 +144,14 @@ pub fn render(ui: &mut egui::Ui, template: &dyn Template, dark_mode: bool, pendi
                 painter.text(
                     letter_rect.center(),
                     egui::Align2::CENTER_CENTER,
-                    &opt[0..1],
+                    letter,
                     egui::FontId::proportional(9.0),
                     Color32::WHITE,
                 );
                 painter.text(
                     opt_rect.min + egui::vec2(24.0, 3.0),
                     egui::Align2::LEFT_TOP,
-                    &opt[2..],
+                    &full_text[2..], // 去掉"A. "前缀
                     egui::FontId::proportional(11.0),
                     parse_color(&theme.highlight_text),
                 );
@@ -135,14 +166,14 @@ pub fn render(ui: &mut egui::Ui, template: &dyn Template, dark_mode: bool, pendi
                 painter.text(
                     letter_rect.center(),
                     egui::Align2::CENTER_CENTER,
-                    &opt[0..1],
+                    letter,
                     egui::FontId::proportional(9.0),
                     parse_color(&theme.primary_dark),
                 );
                 painter.text(
                     opt_rect.min + egui::vec2(24.0, 3.0),
                     egui::Align2::LEFT_TOP,
-                    &opt[2..],
+                    &full_text[2..], // 去掉"A. "前缀
                     egui::FontId::proportional(11.0),
                     parse_color(&theme.text),
                 );
@@ -157,17 +188,15 @@ pub fn render(ui: &mut egui::Ui, template: &dyn Template, dark_mode: bool, pendi
         painter.text(
             btn_rect.center(),
             egui::Align2::CENTER_CENTER,
-            "提交本题",
+            &texts.submit,
             egui::FontId::proportional(12.0),
             Color32::WHITE,
         );
 
         // 导入导出按钮
-        let export_text = "导出主题";
-        let import_text = "导入主题";
         let font = egui::FontId::proportional(13.0);
-        let export_width = ui.fonts(|f| f.layout(export_text.to_string(), font.clone(), Color32::WHITE, f32::INFINITY).size().x) + 20.0;
-        let import_width = ui.fonts(|f| f.layout(import_text.to_string(), font.clone(), Color32::WHITE, f32::INFINITY).size().x) + 20.0;
+        let export_width = ui.fonts(|f| f.layout(texts.export_theme.to_string(), font.clone(), Color32::WHITE, f32::INFINITY).size().x) + 20.0;
+        let import_width = ui.fonts(|f| f.layout(texts.import_theme.to_string(), font.clone(), Color32::WHITE, f32::INFINITY).size().x) + 20.0;
         let button_spacing = 16.0;
         let total_width = export_width + button_spacing + import_width;
         let start_x = rect.center().x - total_width / 2.0;
@@ -178,7 +207,7 @@ pub fn render(ui: &mut egui::Ui, template: &dyn Template, dark_mode: bool, pendi
         ui.allocate_ui_at_rect(button_rect, |ui| {
             ui.horizontal(|ui| {
                 ui.set_height(28.0);
-                if ui.add_sized([export_width, 24.0], egui::Button::new(export_text)).clicked() {
+                if ui.add_sized([export_width, 24.0], egui::Button::new(&texts.export_theme)).clicked() {
                     let json = theme.to_json().unwrap_or_default();
                     if let Some(path) = FileDialog::new()
                         .add_filter("JSON", &["json"])
@@ -189,7 +218,7 @@ pub fn render(ui: &mut egui::Ui, template: &dyn Template, dark_mode: bool, pendi
                     }
                 }
                 ui.add_space(button_spacing);
-                if ui.add_sized([import_width, 24.0], egui::Button::new(import_text)).clicked() {
+                if ui.add_sized([import_width, 24.0], egui::Button::new(&texts.import_theme)).clicked() {
                     if let Some(path) = FileDialog::new()
                         .add_filter("主题文件", &["json"])
                         .set_directory(std::env::current_dir().unwrap_or_default())
@@ -201,6 +230,6 @@ pub fn render(ui: &mut egui::Ui, template: &dyn Template, dark_mode: bool, pendi
             });
         });
     } else {
-        ui.label("无预览");
+        ui.label(&texts.no_preview);
     }
 }
