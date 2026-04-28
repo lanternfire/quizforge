@@ -162,7 +162,7 @@ pub fn render(ui: &mut egui::Ui, template: &dyn Template, dark_mode: bool, pendi
             Color32::WHITE,
         );
 
-        // 按钮区域：左右并排，中心与预览图中心对齐，宽度根据文字自适应
+        // 导入导出按钮
         let export_text = "导出主题";
         let import_text = "导入主题";
         let font = egui::FontId::proportional(13.0);

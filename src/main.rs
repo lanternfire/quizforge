@@ -5,6 +5,7 @@ mod parser;
 mod task;
 mod templates;
 mod ui;
+mod localization;   // 新增
 
 use eframe::egui;
 

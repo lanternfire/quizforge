@@ -20,8 +20,10 @@ pub fn render(ui: &mut egui::Ui, app: &mut App) {
     let current_template: Arc<dyn crate::templates::Template> =
         Arc::clone(&app.templates[app.selected_template_idx]);
 
+    let title_text = app.tr("app_title").to_string();
+
     ui.heading(
-        egui::RichText::new("题匠")
+        egui::RichText::new(&title_text)
             .color(heading_color)
             .size(24.0)
             .strong(),
@@ -53,7 +55,6 @@ pub fn render(ui: &mut egui::Ui, app: &mut App) {
         });
 
         columns[1].vertical_centered(|ui| {
-            // 传入 pending_import 的引用
             preview::render(ui, current_template.as_ref(), dark, &mut app.pending_import_theme);
         });
     });

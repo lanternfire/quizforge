@@ -7,26 +7,32 @@ use super::super::App;
 
 pub fn render(ui: &mut egui::Ui, app: &mut App) {
     let dark = app.dark_mode;
-    let gen_button = egui::Button::new(
-        egui::RichText::new("批量生成 HTML 网页").size(16.0).strong(),
-    )
-    .fill(if dark { Color32::from_rgb(50, 130, 80) } else { Color32::from_rgb(0xC0, 0xC0, 0xFF) })
-    .rounding(10.0)
-    .min_size(egui::vec2(ui.available_width(), 42.0));
+
+    // 提前获取翻译
+    let generate_btn_text = app.tr("generate_btn").to_string();
+    let gen_fail_read = app.tr("gen_fail_read").to_string();
+    let gen_fail_parse = app.tr("gen_fail_parse").to_string();
+    let gen_success = app.tr("gen_success").to_string();
+    let gen_fail_write = app.tr("gen_fail_write").to_string();
+
+    let gen_button = egui::Button::new(&generate_btn_text)
+        .fill(if dark { Color32::from_rgb(50, 130, 80) } else { Color32::from_rgb(0xC0, 0xC0, 0xFF) })
+        .rounding(10.0)
+        .min_size(egui::vec2(ui.available_width(), 42.0));
 
     if ui.add(gen_button).clicked() {
         for task in &mut app.tasks {
             let content = match fs::read_to_string(&task.input_path) {
                 Ok(c) => c,
                 Err(e) => {
-                    task.status = format!("[FAIL] 读取失败: {}", e);
+                    task.status = format!("[FAIL] {}: {}", gen_fail_read, e);
                     continue;
                 }
             };
             let (title_from_file, questions) = match parse_quiz_file(&content) {
                 Ok(r) => r,
                 Err(e) => {
-                    task.status = format!("[FAIL] 解析失败: {}", e);
+                    task.status = format!("[FAIL] {}: {}", gen_fail_parse, e);
                     continue;
                 }
             };
@@ -66,10 +72,10 @@ pub fn render(ui: &mut egui::Ui, app: &mut App) {
 
             match fs::write(&output_path, html) {
                 Ok(_) => {
-                    task.status = format!("[OK] 生成成功 -> {}", output_path);
+                    task.status = format!("[OK] {} -> {}", gen_success, output_path);
                     task.completed = true;
                 }
-                Err(e) => task.status = format!("[FAIL] 写入失败: {}", e),
+                Err(e) => task.status = format!("[FAIL] {}: {}", gen_fail_write, e),
             }
         }
     }

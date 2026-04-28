@@ -10,6 +10,7 @@ use crate::task::QuizTask;
 use crate::templates;
 use crate::templates::theme::Theme;
 use crate::templates::QuizTemplate;
+use crate::localization::Locale;
 
 pub struct App {
     pub tasks: Vec<QuizTask>,
@@ -18,6 +19,8 @@ pub struct App {
     active_tab: Tab,
     pub dark_mode: bool,
     pending_import_theme: Option<String>,
+    locale: Locale,
+    current_lang: String,
 }
 
 #[derive(PartialEq)]
@@ -36,13 +39,24 @@ impl Default for App {
             active_tab: Tab::Main,
             dark_mode: false,
             pending_import_theme: None,
+            locale: Locale::load("zh_cn"),
+            current_lang: "zh_cn".to_string(),
         }
+    }
+}
+
+impl App {
+    pub fn tr<'a>(&'a self, key: &'a str) -> &'a str {
+        self.locale.tr(key)
+    }
+    pub fn locale(&self) -> &Locale {
+        &self.locale
     }
 }
 
 impl eframe::App for App {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
-        // 主题设置
+        // 主题设置（保持不变）
         if self.dark_mode {
             ctx.set_visuals(egui::Visuals::dark());
             ctx.style_mut(|style| {
@@ -74,7 +88,7 @@ impl eframe::App for App {
         let bg_color = if self.dark_mode {
             Color32::from_rgb(30, 33, 40)
         } else {
-            Color32::from_rgb(0xF6, 0xFD, 0xF6)   // #f6fdf6
+            Color32::from_rgb(0xF6, 0xFD, 0xF6)
         };
 
         egui::CentralPanel::default()
@@ -82,15 +96,14 @@ impl eframe::App for App {
                 .fill(bg_color)
                 .inner_margin(egui::vec2(20.0, 10.0)))
             .show(ctx, |ui| {
-                tab_bar::render(ui, &mut self.active_tab, &mut self.dark_mode);
+                tab_bar::render(ui, &mut self.active_tab, &mut self.dark_mode, &mut self.current_lang, &mut self.locale);
                 match self.active_tab {
                     Tab::Main => main_tab::render(ui, self),
-                    Tab::Example => example_tab::render(ui, self.dark_mode),
+                    Tab::Example => example_tab::render(ui, self.dark_mode, self.locale()),
                 }
 
-                // 版本号（仅主界面右下角）
                 if self.active_tab == Tab::Main {
-                    let version_text = "QuizForge v1.0.0";
+                    let version_text = self.tr("version");
                     let font = egui::FontId::monospace(11.0);
                     let text_color = if self.dark_mode {
                         Color32::from_gray(180)

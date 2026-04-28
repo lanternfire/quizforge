@@ -1,6 +1,7 @@
 use eframe::egui;
+use crate::localization::Locale;
 
-pub fn render(ui: &mut egui::Ui, dark_mode: bool) {
+pub fn render(ui: &mut egui::Ui, dark_mode: bool, locale: &Locale) {
     let heading_color = if dark_mode {
         egui::Color32::from_rgb(130, 190, 230)
     } else {
@@ -16,7 +17,7 @@ pub fn render(ui: &mut egui::Ui, dark_mode: bool) {
         .max_height(ui.available_height())
         .show(ui, |ui| {
             ui.heading(
-                egui::RichText::new("帮助中心")
+                egui::RichText::new(locale.tr("tab_help"))
                     .color(heading_color)
                     .size(24.0)
                     .strong(),
@@ -25,11 +26,11 @@ pub fn render(ui: &mut egui::Ui, dark_mode: bool) {
 
             ui.group(|ui| {
                 ui.set_width(ui.available_width());
-                ui.label(egui::RichText::new("使用流程").size(16.0).color(text_color).strong());
+                ui.label(egui::RichText::new(locale.tr("help_usage_title")).size(16.0).color(text_color).strong());
                 ui.add_space(5.0);
-                ui.label("1. 将原始题库（PDF/Word/图片）发送给 AI（如 ChatGPT、文心一言等），让 AI 按本软件支持的 txt 格式输出题目。");
-                ui.label("2. 将生成的 txt 文件导入本软件。");
-                ui.label("3. 选择模板，点击\"批量生成 HTML 网页\"，即可获得可分享的答题网页。");
+                ui.label(locale.tr("help_usage_step1"));
+                ui.label(locale.tr("help_usage_step2"));
+                ui.label(locale.tr("help_usage_step3"));
             });
 
             ui.add_space(10.0);
@@ -37,11 +38,11 @@ pub fn render(ui: &mut egui::Ui, dark_mode: bool) {
             ui.group(|ui| {
                 ui.set_width(ui.available_width());
                 ui.horizontal(|ui| {
-                    ui.label(egui::RichText::new("AI 提示词模板").size(16.0).color(text_color).strong());
+                    ui.label(egui::RichText::new(locale.tr("help_ai_title")).size(16.0).color(text_color).strong());
                     ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                         if ui.add(
                             egui::Button::new(
-                                egui::RichText::new("复制提示词").color(egui::Color32::WHITE)
+                                egui::RichText::new(locale.tr("copy_prompt_btn")).color(egui::Color32::WHITE)
                             )
                             .fill(if dark_mode { egui::Color32::from_rgb(60, 130, 180) } else { egui::Color32::from_rgb(0xC0, 0xC0, 0xFF) })
                             .min_size(egui::vec2(100.0, 26.0))
