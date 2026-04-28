@@ -1,28 +1,30 @@
-# 题匠 (QuizForge)
+# QuizForge (题匠)
 
-题库网页生成器。将特定格式的 `.txt` 题库文件批量生成可独立运行的交互式答题网页（`.html`）。支持单选、多选、填空（包括多空）、判断四种题型，生成的网页无需服务器，直接用浏览器打开即可答题。
+A desktop tool to batch convert specially formatted `.txt` quiz files into self-contained interactive web pages (`.html`). Supports single choice, multiple choice, fill-in-the-blank (multiple blanks), and true/false questions. The generated pages work offline in any browser.
 
-## 功能特点
+> :cn: [中文版 (Chinese)](/README_zh.md)
 
-- 双标签页界面：主界面与帮助中心一键切换
-- 内置 9 个精选主题（默认、橙、绿、红、粉、黄、蓝、紫、灰），可自行扩展
-- 深色/浅色模式一键切换，自动适配所有控件
-- 每个导入的文件可单独设置模板主题，也可跟随全局设置
-- 一键将所有文件的主题重置为跟随全局
-- 可分别设置输出目录和文件名（界面中显示无后缀名，自动附加 `.html` 后缀）
-- 页面标题支持手动自定义，留空则使用题库文件中的标题，若仍无标题则使用“在线练习”
-- 支持单选题、多选题、填空题、判断题
-- 填空题支持多空，基于答案分号自动识别空数
-- 生成的网页自包含 HTML（无需额外文件），移动端适配，逐题提交，得分显示，键盘快捷键
-- 题库支持 `#` 单行注释
-- 选择题答案分隔符兼容中英文逗号；填空题多空分隔符兼容中英文分号
-- 可直接将 `.txt` 文件拖入窗口添加题库
-- 可在文件名前添加日期，也可在网页底部显示生成时间
-- 预设主题颜色存储在 `assets/themes/` 下的 JSON 文件中，编译时嵌入 exe。支持导入外部 JSON 主题文件，也可将当前主题导出为 JSON，方便分享和备份
-- 支持中英文界面切换，语言文件以 JSON 形式嵌入，无需额外配置
-- 支持中英文题库格式，自动识别题型、标题等关键词，可处理双语题库文件
+## Features
 
-## 技术栈
+- Two-tab interface: main workspace and help center
+- 9 built-in themes (default, orange, green, red, pink, yellow, blue, purple, gray) with expandable support
+- Dark / light mode toggle, all controls adapt automatically
+- Per-file theme assignment or follow global theme
+- One-click "Apply to All" to reset all tasks to global theme
+- Custom output directory and filename (suffix `.html` added automatically)
+- Editable page title; falls back to the title in the quiz file, then to "在线练习"
+- Question types: single choice, multiple choice, fill-in-the-blank, true/false
+- Fill-in-the-blank supports multiple blanks (separated by semicolons)
+- Generated HTML is self-contained, mobile-friendly, with question-by-question submission, scoring, and keyboard shortcuts
+- `#` single-line comments in quiz files
+- Chinese/English comma and semicolon compatibility for answers
+- Drag and drop `.txt` files to import
+- Timestamp options: add date to filename, display generation time on web page
+- Theme colors stored in JSON under `assets/themes/`, compiled into the exe; import/export themes via JSON
+- UI localization (Chinese / English), language files embedded in the exe
+- Quiz file format supports both Chinese and English keywords (e.g., `题型：` vs `Type:`, `题目：` vs `Question:`)
+
+## Tech Stack
 
 - Rust 2021
 - egui 0.27 + eframe 0.27
@@ -32,34 +34,34 @@
 - image 0.24
 - chrono
 
-## 编译与运行
+## Build & Run
 
-### 环境要求
+### Requirements
 
-- Rust 工具链（rustc、cargo）
-- Windows 下建议安装 `C:/Windows/Fonts/simhei.ttf` 字体（用于界面中文显示，若没有会自动回退）
+- Rust toolchain (rustc, cargo)
+- On Windows, installing `C:/Windows/Fonts/simhei.ttf` is recommended for Chinese text (falls back if missing)
 
-### 编译发布版
+### Release build
 
 ```bash
 cargo build --release
 ```
 
-生成的可执行文件位于 `target/release/quizforge.exe`。发布时只需分发 exe 文件，所有主题和语言数据已嵌入，无需附带 `assets` 文件夹。
+The executable will be `target/release/quizforge.exe`. Distribute only the exe — all themes and languages are embedded.
 
-### 开发调试
+### Development
 
 ```bash
 cargo run
 ```
 
-## 使用方法
+## Usage
 
-### 准备题库文件
+### Prepare Quiz Files
 
-题库文件为纯文本 `.txt`，编码建议 UTF-8。支持**中文格式**和**英文格式**两种书写方式，程序会自动识别。
+Quiz files are plain `.txt`, UTF-8 recommended. Both **Chinese** and **English** formats are supported.
 
-#### 中文格式（默认）
+#### Chinese format (default)
 
 ```
 # 这是一行注释
@@ -70,30 +72,9 @@ cargo run
 题目：35 + 28 = ?
 选项：53|63|73|62
 答案：1
-
----
-题型：多选
-题目：哪些算式等于24？
-选项：8×3|30-6|20+4|4×6
-答案：1,2,3,4
-
----
-题型：填空
-题目：6 × 7 = ?
-答案：42|四十二
-
----
-题型：填空
-题目：两个数的和是5
-答案：2|二；3|三
-
----
-题型：判断
-题目：81 - 36 = 45 正确吗？
-答案：错误
 ```
 
-#### 英文格式（v1.1+ 支持）
+#### English format (v1.1+)
 
 ```
 # This is a comment
@@ -104,78 +85,60 @@ Type: Single
 Question: What is 1+1?
 Options: 1|2|3|4
 Answer: 2
-
----
-Type: Multiple
-Question: Which are even numbers?
-Options: 1|2|3|4
-Answer: 2,4
-
----
-Type: Fill
-Question: Two plus two equals ?
-Answer: 4|four
-
----
-Type: Judgment
-Question: The sky is blue.
-Answer: True
 ```
 
-**规则**
+**Rules**
 
-- 文件第一块可以是 `标题：xxx` 或 `Title: xxx`（可选），否则默认用文件名作为标题。
-- 题目之间用 `---`（三个减号）分隔。
-- 每道题包含：`题型：` 或 `Type:`、`题目：` 或 `Question:`、`选项：` 或 `Options:`（单选/多选）、`答案：` 或 `Answer:`。
-- 支持 `#` 开头的单行注释，解析时自动忽略。
-- **答案序号从 1 开始计数**（1 表示第一个选项），程序内部会自动转换为 0 基索引。
-- 单选题答案：单个数字，表示正确选项序号（1/2/3...）。
-- 多选题答案：用逗号分隔的数字（中英文逗号均可），如 `1,2,3`。
-- 填空题答案：
-  - 单个空：多个可接受答案用 `|` 分隔，如 `42|四十二`。
-  - 多个空：用分号（英文 `;` 或中文 `；`）分隔不同的空，每个空内部仍用 `|` 分隔可接受答案。程序根据分号的数量自动确定有几个空，无需在题目中加特殊标记。
-- 判断题答案：写 `正确`/`错误` 或 `true`/`false`（大小写均可，也支持 `yes`/`no`、`对`/`错`）。
+- First block can optionally contain `标题：xxx` or `Title: xxx`, otherwise the file name is used.
+- Questions are separated by `---` (three dashes).
+- Each question must include: type, question, options (for choice types), and answer.
+- `#` starts a comment.
+- **Answer indices start from 1** (internally converted to 0).
+- Single choice: a single number.
+- Multiple choice: comma-separated numbers (Chinese/English comma both OK).
+- Fill-in-the-blank: single blank — separate multiple acceptable answers with `|`. Multiple blanks — separate blanks with `;` (or `；`), each blank uses `|` for alternatives.
+- True/false: `正确`/`错误` or `true`/`false` (also `yes`/`no`, `对`/`错`).
 
-### 使用流程
+### Workflow
 
-1. 将原始题库（PDF/Word/图片）发送给 AI（如 ChatGPT 等），让 AI 按照上述格式输出 txt。
-2. 将生成的 txt 文件导入软件（可通过文件对话框或拖拽）。
-3. 选择模板，点击“批量生成 HTML 网页”，即可获得可分享的答题网页。
+1. Send PDF/Word/image quizzes to AI (e.g., ChatGPT) to convert to standard txt.
+2. Import the txt file (dialog or drag-and-drop).
+3. Choose a template and click "Generate" / "批量生成 HTML 网页".
 
-右侧预览区可实时查看主题效果，预览区下方提供“导出主题”和“导入主题”按钮，用于分享和加载外部主题。
+The right-side preview shows the selected theme; export/import buttons are below it.
 
-### 切换语言
+### Switching Language
 
-点击标签栏右侧的下拉菜单（中文/English），可即时切换界面语言。所有按钮、标签、提示文字、帮助中心内容以及预览图文字均会同步更新。当前支持简体中文和美式英文。
+Use the dropdown menu (中文/English) in the top bar to switch the UI language instantly. All labels, buttons, help content, and preview text will update.
 
-## 深色模式
+## Dark Mode
 
-点击标签栏右侧的“深色模式”按钮可切换界面配色，再次点击切回浅色。
+Click the "Dark" / "深色模式" button in the top bar to toggle dark/light mode.
 
-## 模板扩展
+## Theme Extension
 
-预设主题颜色存储在 `assets/themes/` 下的 JSON 文件中，目前包含 9 个主题。若要添加新主题，可创建新的 JSON 文件，并修改 `src/templates/mod.rs` 中的 `all_templates()` 函数加载它。也可通过软件界面的“导入主题”按钮加载外部 `.json` 文件。
+Preset themes are stored in `assets/themes/` as JSON files. To add a new theme, create a new JSON and load it in `all_templates()` in `src/templates/mod.rs`. You can also import a `.json` theme via the "Import" button in the preview area.
 
-## 常见问题
+## FAQ
 
-**生成的网页在手机端能正常使用吗？**  
-可以。模板使用了响应式设计，会自动适配移动设备。
+**Does the generated page work on mobile?**  
+Yes. The template uses responsive design.
 
-**填空答案是否区分大小写？**  
-目前匹配方式为完全相等（区分大小写和全角/半角），填写时请注意与答案一致。
+**Is the fill-in-the-blank answer case-sensitive?**  
+Answer matching is exact (case and full/half-width characters matter). Please match the expected answer exactly.
 
-**多空填空题怎么设置？**  
-答案中用分号（`;` 或 `；`）分隔不同空，每个空内部仍用 `|` 分隔多个可接受答案。程序会自动根据分号数量识别空的数量。
+**How to set up multiple blanks?**  
+Use `;` or `；` to separate blanks; each blank's answers are separated by `|`.
 
-**为什么程序只有一个 exe 文件也能运行？**  
-主题 JSON 和语言文件已通过编译嵌入 exe，无需外部资源文件。
+**Why does the program work as a single exe?**  
+Themes and language files are embedded at compile time.
 
-**如何让 AI 帮我生成 txt 题库？**  
-打开软件的“帮助中心”标签页，复制 AI 提示词模板，附上题目图片或文档发送给 AI。
+**How to use AI to generate txt files?**  
+Open the "Help" tab, copy the AI prompt template, and send it to the AI along with your quiz materials.
 
-**如何分享或备份主题？**  
-使用预览区下方的“导出主题”按钮将当前主题保存为 `.json` 文件；使用“导入主题”按钮可加载 `.json` 文件。
+**How to share or backup themes?**  
+Use the "Export" button below the preview to save a theme as `.json`; use "Import" to load one.
 
-## 许可证
+## License
 
-本项目使用 MIT 许可证，详见 [LICENSE](LICENSE) 文件。
+This project is licensed under the MIT License — see the [LICENSE](LICENSE) file.
