@@ -7,8 +7,6 @@ use super::super::App;
 
 pub fn render(ui: &mut egui::Ui, app: &mut App) {
     let dark = app.dark_mode;
-
-    // 提前获取翻译
     let generate_btn_text = app.tr("generate_btn").to_string();
     let gen_fail_read = app.tr("gen_fail_read").to_string();
     let gen_fail_parse = app.tr("gen_fail_parse").to_string();
@@ -21,6 +19,7 @@ pub fn render(ui: &mut egui::Ui, app: &mut App) {
         .min_size(egui::vec2(ui.available_width(), 42.0));
 
     if ui.add(gen_button).clicked() {
+        let locale = app.locale().clone();
         for task in &mut app.tasks {
             let content = match fs::read_to_string(&task.input_path) {
                 Ok(c) => c,
@@ -43,13 +42,14 @@ pub fn render(ui: &mut egui::Ui, app: &mut App) {
             };
             let json = serde_json::to_string(&questions).unwrap();
 
-            let generate_time_html = if task.display_time {
+            // 生成时间 HTML（包含时间前缀和实际时间）
+            let generate_time_value = if task.display_time {
                 let time_str = if task.use_current_time {
                     Local::now().format("%Y-%m-%d").to_string()
                 } else {
                     task.custom_time.clone()
                 };
-                format!("<div class=\"generate-time\">生成时间：{}</div>", time_str)
+                format!("<div class=\"generate-time\">{} {}</div>", locale.tr("html_generate_time_prefix"), time_str)
             } else {
                 String::new()
             };
@@ -68,7 +68,7 @@ pub fn render(ui: &mut egui::Ui, app: &mut App) {
 
             let template_idx = task.selected_template.unwrap_or(app.selected_template_idx);
             let template = &app.templates[template_idx];
-            let html = template.generate_html(&page_title, &json, &generate_time_html);
+            let html = template.generate_html(&page_title, &json, &generate_time_value, &locale);
 
             match fs::write(&output_path, html) {
                 Ok(_) => {
