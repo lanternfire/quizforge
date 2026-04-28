@@ -1,0 +1,91 @@
+use serde::{Deserialize, Serialize};
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Theme {
+    pub name: String,
+    pub bg: String,
+    pub card_bg: String,
+    pub primary_light: String,
+    pub primary: String,
+    pub primary_mid: String,
+    pub primary_dark: String,
+    pub primary_deep: String,
+    pub border: String,
+    pub shadow: String,
+    pub shadow_hover: String,
+    pub text: String,
+    pub text_light: String,
+    pub correct_bg: String,
+    pub correct_border: String,
+    pub wrong_bg: String,
+    pub wrong_border: String,
+    pub highlight_bg: String,
+    pub highlight_border: String,
+    pub highlight_text: String,
+    pub btn_prev_bg: String,
+    pub btn_prev_hover: String,
+    pub btn_submit_bg: String,
+    pub btn_submit_hover: String,
+    pub btn_next_bg: String,
+    pub btn_next_hover: String,
+    pub btn_reset_bg: String,
+    pub btn_reset_hover: String,
+    pub progress_bg: String,
+    pub progress_gradient_start: String,
+    pub progress_gradient_end: String,
+    pub question_bg: String,
+    pub question_border: String,
+    pub badge_bg: String,
+    pub badge_single_bg: String,
+    pub badge_single_text: String,
+    pub badge_fill_bg: String,
+    pub badge_fill_text: String,
+    pub badge_judge_bg: String,
+    pub badge_judge_text: String,
+    pub badge_multiple_bg: String,
+    pub badge_multiple_text: String,
+    pub option_border: String,
+    pub option_hover_border: String,
+    pub option_hover_bg: String,
+    pub option_letter_bg: String,
+    pub option_selected_border: String,
+    pub option_selected_bg: String,
+    pub option_correct_border: String,
+    pub option_correct_bg: String,
+    pub option_wrong_border: String,
+    pub option_wrong_bg: String,
+    pub option_missed_border: String,
+    pub option_missed_bg: String,
+    pub fill_input_border: String,
+    pub fill_input_focus_border: String,
+    pub fill_input_focus_shadow: String,
+    pub fill_input_has_value_border: String,
+    pub fill_input_has_value_shadow: String,
+    pub fill_hint_text: String,
+    pub fill_correct_text: String,
+    pub judge_border: String,
+    pub judge_hover_border: String,
+    pub judge_selected_border: String,
+    pub judge_selected_bg: String,
+    pub judge_correct_border: String,
+    pub judge_correct_bg: String,
+    pub judge_wrong_border: String,
+    pub judge_wrong_bg: String,
+    pub score_bg: String,
+    pub score_border: String,
+    pub score_num_color: String,
+    pub score_total_color: String,
+    pub time_color: String,
+}
+
+impl Theme {
+    /// 从 JSON 字符串加载主题
+    pub fn from_json(json: &str) -> Result<Self, serde_json::Error> {
+        serde_json::from_str(json)
+    }
+
+    /// 将主题导出为 JSON 字符串
+    pub fn to_json(&self) -> Result<String, serde_json::Error> {
+        serde_json::to_string_pretty(self)
+    }
+}
