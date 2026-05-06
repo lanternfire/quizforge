@@ -1,0 +1,37 @@
+# Rust build artifacts
+src-tauri/target/
+
+# Node.js
+node_modules/
+package-lock.json
+
+# Frontend build output
+dist/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Tauri generated files
+src-tauri/gen/
+
+# Build/dev scripts (not needed for source integrity)
+build.bat
+run_dev.bat
+*.py
+
+# Sample files
+sample_en.txt
+
+# Misc generated
+gen_icon.py
